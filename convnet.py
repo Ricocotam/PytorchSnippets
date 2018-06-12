@@ -66,7 +66,6 @@ def train(model, nb_epoch, trainloader, optimizer, loss_function, device):
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            print("Total loss :", total_loss / len(trainloader))
 
 
 device = torch.device("cuda:0")
