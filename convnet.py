@@ -51,15 +51,16 @@ class ConvNet(nn.Module):
 def train(model, nb_epoch, trainloader, optimizer, loss_function, device):
     for epoch in range(nb_epoch):
         with tqdm(trainloader, bar_format="{l_bar}{bar}{n_fmt}/{total_fmt}, ETA:{remaining}{postfix}", ncols=80, desc="Epoch " + str(epoch)) as t:
-            sucess, n = 0, len(trainloader)
-            total_loss = 0
+            mean_loss, n = 0, 0
             for x, y in t:
                 x = x.to(device)
                 y = y.to(device)
 
                 pred = model(x)
                 loss = loss_function(pred, y)
-                total_loss += loss.tolist()
+
+                n += 1
+                mean_loss += (n-1) * mean_loss + loss.tolist() / n
                 t.set_postfix({"train_loss": "{0:.3f}".format(loss.tolist())})
 
                 optimizer.zero_grad()
