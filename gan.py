@@ -91,6 +91,8 @@ discri_optim = optim.Adadelta(discri.parameters())
 
 loss_function = nn.BCELoss()
 
+k = 5
+
 print("Training")
 
 for epoch in range(nb_epoch):
@@ -102,6 +104,16 @@ for epoch in range(nb_epoch):
             valid = torch.ones(real_imgs.size(0)).to(device)
             fake = torch.zeros(real_imgs.size(0)).to(device)
 
+            # Train Discriminator
+            for _ in range(k):
+                real_loss = loss_function(discri(real_imgs), valid)
+                fake_loss = loss_function(discri(gen_imgs.detach()), fake)
+                discri_loss = (real_loss + fake_loss) / 2
+
+                discri_optim.zero_grad()
+                discri_loss.backward()
+                discri_optim.step()
+
             # Train Generator
             input_noise = torch.rand(valid.size(0), input_noise_size).to(device)
             gen_imgs = gen(input_noise)
@@ -112,14 +124,7 @@ for epoch in range(nb_epoch):
             gen_loss.backward()
             gen_optim.step()
 
-            # Train Discriminator
-            real_loss = loss_function(discri(real_imgs), valid)
-            fake_loss = loss_function(discri(gen_imgs.detach()), fake)
-            discri_loss = (real_loss + fake_loss) / 2
 
-            discri_optim.zero_grad()
-            discri_loss.backward()
-            discri_optim.step()
 
             n += 1
             disc = ((n-1) * disc + discri_loss.tolist()) / n
@@ -127,7 +132,7 @@ for epoch in range(nb_epoch):
             t.set_postfix({"gen_loss": "{0:.3f}".format(gene), "discri_loss": "{0:.3f}".format(disc)})
 
         os.system("mkdir outputs/epoch" + str(epoch))
-        r = torch.rand(20, input_noise_size).to(device)
+        r = torch.rand(10, input_noise_size).to(device)
         pred = gen(r)
         pred = pred.detach().cpu().numpy()
         pred = np.swapaxes(pred, 1, 3)
