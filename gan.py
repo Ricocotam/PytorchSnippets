@@ -23,11 +23,11 @@ class Generator(nn.Module):
             nn.Upsample(scale_factor=2),
             nn.Conv2d(128, 128, 3, stride=1, padding=1),
             nn.BatchNorm2d(128, 0.8),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Upsample(scale_factor=2),
             nn.Conv2d(128, 64, 3, stride=1, padding=1),
             nn.BatchNorm2d(64, 0.8),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Conv2d(64, 3, 3, stride=1, padding=1),
             nn.Tanh()
         )
@@ -45,7 +45,7 @@ class Discriminator(nn.Module):
 
         def discriminator_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, 3, 2, 1),
-                     nn.ReLU(),
+                     nn.LeakyReLU(),
                      nn.Dropout2d(0.25)]
             if bn:
                 block.append(nn.BatchNorm2d(out_filters, 0.8))
@@ -103,7 +103,7 @@ for epoch in range(nb_epoch):
             fake = torch.zeros(real_imgs.size(0)).to(device)
 
             # Train Generator
-            input_noise = torch.rand(valid.size(0), input_noise_size).to(device)
+            input_noise = torch.randn(valid.size(0), input_noise_size).to(device)
             gen_imgs = gen(input_noise)
 
             gen_loss = loss_function(discri(gen_imgs), valid)
