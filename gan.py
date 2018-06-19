@@ -71,9 +71,9 @@ class Discriminator(nn.Module):
         return validity
 
 
-input_noise_size = 100
+input_noise_size = 2000
 batch_size = 8
-device = torch.device("cuda:0")
+device = torch.device("cpu:0")
 nb_epoch = 200
 
 print("Loading data")
@@ -91,7 +91,7 @@ discri_optim = optim.Adadelta(discri.parameters())
 
 loss_function = nn.BCELoss()
 
-k = 5
+k = 1
 
 print("Training")
 
@@ -104,6 +104,9 @@ for epoch in range(nb_epoch):
             valid = torch.ones(real_imgs.size(0)).to(device)
             fake = torch.zeros(real_imgs.size(0)).to(device)
 
+            input_noise = torch.randn(valid.size(0), input_noise_size).to(device)
+            gen_imgs = gen(input_noise)
+
             # Train Discriminator
             for _ in range(k):
                 real_loss = loss_function(discri(real_imgs), valid)
@@ -115,9 +118,6 @@ for epoch in range(nb_epoch):
                 discri_optim.step()
 
             # Train Generator
-            input_noise = torch.randn(valid.size(0), input_noise_size).to(device)
-            gen_imgs = gen(input_noise)
-
             gen_loss = loss_function(discri(gen_imgs), valid)
 
             gen_optim.zero_grad()
