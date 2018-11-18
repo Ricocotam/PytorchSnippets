@@ -4,7 +4,7 @@ import torch.optim as optim
 
 from functools import partial
 
-import basics
+from . import basics
 
 class AutoEncoder(nn.Module):
     """AutoEncoder generic class.

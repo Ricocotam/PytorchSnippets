@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-import .utils
+from . import utils
 
 class FullyConnected(nn.Module):
     """This is a class to make the creation of fully connected block easier.
@@ -123,3 +123,4 @@ class ConvNet(nn.Module):
         conv_out = self.conv(x)
         conv_out = conv_out.view(x.size(0), -1)
         return self.fc(conv_out)
+

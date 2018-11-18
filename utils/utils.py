@@ -128,3 +128,16 @@ def fc_block(input_size, architecture, activation=nn.ReLU):
          temp.append(activation())
     temp = temp[:-1]  # Remove last activation
     return temp
+
+
+def resnet_block(module):
+    class ResNetBlock(nn.Module):
+        def __init__(self, base_module):
+            super(ResNetBlock, self).__init__()
+            self.mod = base_module
+        
+        def forward(self, x):
+            f = self.mod(x)
+            return f + x
+    
+    return ResNetBlock(module)
